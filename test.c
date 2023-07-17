@@ -81,7 +81,14 @@ int main(){
 	//load font
 	Font fontId = XLoadFont(d, fontlist[0]);
 	if (fontId == BadName || fontId == BadAlloc) { printf("bad name/BadAlloc \n");};
+	
+	// get XFontStruct
+	XFontStruct *fontStruct = XQueryFont(d, fontId);
 
+	/*
+	//testing fontid
+	if (fontId == fontStruct->fid){printf("good\n");};
+	*/
 
 	//unload font
 	XUnloadFont(d, fontId);

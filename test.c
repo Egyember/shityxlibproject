@@ -4,6 +4,22 @@
 #include <X11/Xcms.h> //color stuff
 #include <unistd.h> //sleep
 
+#define GOOD 0
+#define ERROR -1
+
+
+
+int stringLen(char* str){
+	int len = 0;
+	while (*str != '\0') {
+		str++;
+		len++;
+	}
+	//printf("len: %d",len);
+	return len;
+};
+
+
 int main(){
 	printf("hello word!\n");
 	//connect to the x server ($DISPLAY env)
@@ -70,7 +86,10 @@ int main(){
 	//obtaining font names
 	int numberOfFonts;
 	char **fontlist = XListFonts(d, "*", 10, &numberOfFonts);
-	
+	if(numberOfFonts==0){
+		printf("missing font\n");
+		return ERROR;
+	};	
 	printf("printing fonts \n");
 	printf("%d\n", numberOfFonts);
 	for(int i;numberOfFonts>i;i++){
@@ -90,9 +109,27 @@ int main(){
 	if (fontId == fontStruct->fid){printf("good\n");};
 	*/
 
+	//stirng width
+	char testString[] = "árvíztürő tűkörfúrógép";
+	int testStringWidth;
+	testStringWidth = XTextWidth(fontStruct, testString, stringLen(testString));
+	printf("A testString %d px széles\n", testStringWidth);
+	
+	//drawing string
+		//set font for GCs
+	XSetFont(d, gcRed, fontId);
+	XSetFont(d, gcBlack, fontId);
+		//start drawing
+	XDrawString(d, Win, gcBlack, 10, 10, testString, stringLen(testString));
+		//flush Xbuffer
+	XFlush(d);
+	sleep(10);
+
+
 	//unload font
 	XUnloadFont(d, fontId);
 	//close connection&destroy window
 	XDestroyWindow(d, Win);
 	XCloseDisplay(d);
+	return GOOD;
 };

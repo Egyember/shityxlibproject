@@ -3,21 +3,10 @@
 #include <X11/Xlib.h> //main Xlib header
 #include <X11/Xcms.h> //color stuff
 #include <unistd.h> //sleep
+#include "macros.h"
+#include "types.c"
+#include "bootleglib.c"
 
-#define GOOD 0
-#define ERROR -1
-
-
-
-int stringLen(char* str){
-	int len = 0;
-	while (*str != '\0') {
-		str++;
-		len++;
-	}
-	//printf("len: %d",len);
-	return len;
-};
 
 
 int main(){
@@ -43,7 +32,7 @@ int main(){
 	printf("ds: %d\n", ds);
 
 	//create a window
-	Window Win = XCreateSimpleWindow(d, RootWindow(d, ds), 2, 1, 300, 300, 1, WhitePixel(d, ds), WhitePixel(d, ds));
+	Window Win = XCreateSimpleWindow(d, RootWindow(d, ds), 2, 1, 400, 400, 1, WhitePixel(d, ds), WhitePixel(d, ds));
 	XSelectInput(d, Win, StructureNotifyMask);
 	XMapRaised(d, Win);
 	for(;;) {
@@ -85,7 +74,7 @@ int main(){
 	//
 	//obtaining font names
 	int numberOfFonts;
-	char **fontlist = XListFonts(d, "*", 10, &numberOfFonts);
+	char **fontlist = XListFonts(d, "*-misc-*-medium*-m-*iso8859-2*", 200, &numberOfFonts);
 	if(numberOfFonts==0){
 		printf("missing font\n");
 		return ERROR;
@@ -99,7 +88,10 @@ int main(){
 
 	//load font
 	Font fontId = XLoadFont(d, fontlist[0]);
-	if (fontId == BadName || fontId == BadAlloc) { printf("bad name/BadAlloc \n");};
+	if (fontId == BadName || fontId == BadAlloc){ 
+		printf("bad name/BadAlloc \n");
+		return ERROR;
+		;};
 	
 	// get XFontStruct
 	XFontStruct *fontStruct = XQueryFont(d, fontId);
@@ -110,21 +102,26 @@ int main(){
 	*/
 
 	//stirng width
-	char testString[] = "Ã¡rvÃ­ztÃ¼rÅ‘ tÅ±kÃ¶rfÃºrÃ³gÃ©p";
+	char testString[] = "árvíztürõ tûkörfúrógép";
+	printf("Teszt string: %s\n", testString);
 	int testStringWidth;
 	testStringWidth = XTextWidth(fontStruct, testString, stringLen(testString));
-	printf("A testString %d px szÃ©les\n", testStringWidth);
+	printf("A testString %d px széles\n", testStringWidth);
 	
 	//drawing string
 		//set font for GCs
 	XSetFont(d, gcRed, fontId);
 	XSetFont(d, gcBlack, fontId);
 		//start drawing
-	XDrawString(d, Win, gcBlack, 10, 10, testString, stringLen(testString));
+	XDrawString(d, Win, gcBlack, 30, 30, testString, stringLen(testString));
 		//flush Xbuffer
 	XFlush(d);
 	sleep(10);
-
+//next task load an image and put it to the sceen
+//todo: load ppm files to memory
+//todo: design map and entity data structures
+//todo load map data from a custom file format
+//todo: render image from loaded ppm files (with the cpu)
 
 	//unload font
 	XUnloadFont(d, fontId);

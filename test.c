@@ -1,13 +1,47 @@
-#include <X11/X.h>
 #include <stdio.h>
+#include <X11/X.h>
 #include <X11/Xlib.h> //main Xlib header
 #include <X11/Xcms.h> //color stuff
 #include <unistd.h> //sleep
+#include <stdlib.h>
+#include <string.h>
 #include "macros.h"
 #include "types.c"
-#include "bootleglib.c"
 
+int stringLen(char* str){
+	int len = strlen(str); //local wraper needed because i had no idea tha this thing existed when i wrote the rest of the file
+	return len;
+};
 
+img100* loadimg100(char* PATH){
+	FILE *fptr;
+	fptr = fopen(PATH, "r");
+	if(fptr == NULL){
+		printf("szar PATH\n");
+		exit(ERROR);
+	};
+	//char tmp[3];
+	union uTMP{
+		char small[3];
+		char big[20];
+}tmp;
+	fgets(tmp.small, 3, fptr);
+	if(strcmp(tmp.small,  "P6")){
+		printf("szar file \n");
+		printf("magic byte: %s\n", tmp.small);
+		exit(ERROR);
+	};
+	fgets(tmp.big, 20, fptr); //todo: fix this
+	if(strcmp(tmp.big,  "100 100 255")){ 
+		printf("szar file \n");
+		printf("img size +maxrgb: %s\n", tmp.big);
+		exit(ERROR);
+	};
+	img100* outprt=(img100*)  malloc( sizeof(img100));
+	
+	fclose(fptr);
+	return outprt;
+};
 
 int main(){
 	printf("hello word!\n");
@@ -16,6 +50,8 @@ int main(){
 	d = XOpenDisplay(NULL);
 	if (d==NULL){
 		printf("We are fucked");
+		exit(ERROR);
+
 	};
 	printf("successful connection\n");
 	//test
@@ -77,7 +113,7 @@ int main(){
 	char **fontlist = XListFonts(d, "*-misc-*-medium*-m-*iso8859-2*", 200, &numberOfFonts);
 	if(numberOfFonts==0){
 		printf("missing font\n");
-		return ERROR;
+		exit(ERROR);
 	};	
 	printf("printing fonts \n");
 	printf("%d\n", numberOfFonts);
@@ -90,7 +126,7 @@ int main(){
 	Font fontId = XLoadFont(d, fontlist[0]);
 	if (fontId == BadName || fontId == BadAlloc){ 
 		printf("bad name/BadAlloc \n");
-		return ERROR;
+		exit(ERROR);
 		;};
 	
 	// get XFontStruct
@@ -123,6 +159,8 @@ int main(){
 //todo load map data from a custom file format
 //todo: render image from loaded ppm files (with the cpu)
 
+	loadimg100("./img/player.ppm");
+	
 	//unload font
 	XUnloadFont(d, fontId);
 	//close connection&destroy window

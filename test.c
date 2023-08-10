@@ -22,21 +22,34 @@ img100* loadimg100(char* PATH){
 	};
 	//char tmp[3];
 	union uTMP{
-		char small[3];
-		char big[20];
-}tmp;
-	fgets(tmp.small, 3, fptr);
-	if(strcmp(tmp.small,  "P6")){
+		char small[4];
+		char big[80];
+	}tmp;
+	fgets(tmp.small, 4, fptr);
+	if(strcmp(tmp.small,  "P6\n")){
 		printf("szar file \n");
 		printf("magic byte: %s\n", tmp.small);
 		exit(ERROR);
 	};
-	fgets(tmp.big, 20, fptr); //todo: fix this
-	if(strcmp(tmp.big,  "100 100 255")){ 
+	fgets(tmp.big, 80, fptr); //todo: fix this
+	if(tmp.big[0] == '#'){
+		printf("skiping comment\n");
+		fgets(tmp.big, 80, fptr);
+	};
+	if(strcmp(tmp.big,  "100 100\n")){ 
 		printf("szar file \n");
-		printf("img size +maxrgb: %s\n", tmp.big);
+		printf("img size: %s\n", tmp.big);
 		exit(ERROR);
 	};
+	fgets(tmp.big, 80, fptr);
+	if(strcmp(tmp.big,  "255\n")){ 
+		printf("szar file \n");
+		printf("img maxrgb: %s\n", tmp.big);
+		exit(ERROR);
+	};
+	printf("file good");
+	fclose(fptr);
+	//fopen(PATH, fptr, "rb");
 	img100* outprt=(img100*)  malloc( sizeof(img100));
 	
 	fclose(fptr);
@@ -110,7 +123,7 @@ int main(){
 	//
 	//obtaining font names
 	int numberOfFonts;
-	char **fontlist = XListFonts(d, "*-misc-*-medium*-m-*iso8859-2*", 200, &numberOfFonts);
+	char **fontlist = XListFonts(d, "-misc-unifont-medium-*iso8859-2", 200, &numberOfFonts); //I fucing hate font handeling in X11
 	if(numberOfFonts==0){
 		printf("missing font\n");
 		exit(ERROR);
@@ -138,11 +151,11 @@ int main(){
 	*/
 
 	//stirng width
-	char testString[] = "árvíztürõ tûkörfúrógép";
+	char testString[] = "Ã¡rvÃ­ztÃ¼rÅ‘ tÅ±kÃ¶rfÃºrÃ³gÃ©p";
 	printf("Teszt string: %s\n", testString);
 	int testStringWidth;
 	testStringWidth = XTextWidth(fontStruct, testString, stringLen(testString));
-	printf("A testString %d px széles\n", testStringWidth);
+	printf("A testString %d px szÃ©les\n", testStringWidth);
 	
 	//drawing string
 		//set font for GCs
@@ -159,7 +172,7 @@ int main(){
 //todo load map data from a custom file format
 //todo: render image from loaded ppm files (with the cpu)
 
-	loadimg100("./img/player.ppm");
+	//loadimg100("./img/player.ppm");
 	
 	//unload font
 	XUnloadFont(d, fontId);

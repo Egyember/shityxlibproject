@@ -123,7 +123,7 @@ int main(){
 	//
 	//obtaining font names
 	int numberOfFonts;
-	char **fontlist = XListFonts(d, "-misc-unifont-medium-*iso8859-2", 200, &numberOfFonts); //I fucing hate font handeling in X11
+	char **fontlist = XListFonts(d, "-misc-unifont-medium-*iso8859-2", 200, &numberOfFonts); //I fucking hate font handeling in X11
 	if(numberOfFonts==0){
 		printf("missing font\n");
 		exit(ERROR);
@@ -151,7 +151,7 @@ int main(){
 	*/
 
 	//stirng width
-	char testString[] = "árvíztürő tűkörfúrógép";
+	char testString[] = "árvíztürő tűkörfúrógép"; // todo: convert it to ISO 8856-2 or ISO 10xx the fuck know the number
 	printf("Teszt string: %s\n", testString);
 	int testStringWidth;
 	testStringWidth = XTextWidth(fontStruct, testString, stringLen(testString));

@@ -53,41 +53,25 @@ img100* loadimg100(char* PATH){
 	fclose(fptr);
 	fptr = fopen(PATH, "rb");
 	img100* outprt=(img100*)  malloc( sizeof(img100)); //alloc memory for the rgb map
-	printf("allocated %lu mem at: %p",sizeof(img100), outprt);
+	printf("allocated %lu mem at: %p\n",sizeof(img100), outprt);
 	int readbuffer[300]; //read buffer
 	fseek(fptr, 61, SEEK_SET); //todo: make this not only accept files from gimp
-			//for(int x =0; ;x++){
-				size_t readbytes = fread(
-					readbuffer, 
-					sizeof(int),
-					300,
-					fptr
-					);
-			/*	int y =0;
-				printf("readbytes: %zu\n", readbytes);
-				for(int bufferID=0; bufferID<readbytes;bufferID+=3){
-					printf("asdasd bufferID=%d x=%d y=%d\n", bufferID, x, y);
-					*outprt[x][y][0] = readbuffer[bufferID];
-					//printf("*outprt [%d][%d][0] = %hhu\n", x, y, readbuffer[bufferID]);
-					*outprt[x][y][1] = readbuffer[bufferID+1];
-					//printf("*outprt [%d][%d][1] = %hhu\n", x, y, readbuffer[bufferID+1]);
-					*outprt[x][y][2] = readbuffer[bufferID+2];
-					//printf("*outprt [%d][%d][2] = %hhu\n", x, y, readbuffer[bufferID+2]);
-					y++;
-					printf("y = %d, bufferID = %d\n", y, bufferID);
-				};
-				if(readbytes ==0){
-					printf("this thing happen\n");
-					break;
-				};
-			*/
-//this shoud segfault
-int x = 2;
-int y = 10;
-int bufferID=30;
-printf("%d\n",*outprt[x][y][0]);
-*outprt[x][y][0] = readbuffer[bufferID];
-			//}
+	for(int x =0;x<100 ;x++){
+	size_t readbytes = fread(
+		readbuffer, 
+			sizeof(unsigned char),
+			300,
+			fptr
+		);
+		printf("readbytes: %zu\n", readbytes);
+		int bufferID = 0;
+		for(int y = 0; y<100;y++){
+			for(int rgb = 0; rgb<3; rgb++){
+				(*outprt)[x][y][rgb] = readbuffer[bufferID];
+				bufferID++;
+			};
+		};
+	};
 	fclose(fptr);
 	return outprt;
 };
@@ -210,11 +194,14 @@ int main(){
 
 	img100* playerImg =loadimg100("./img/player.ppm");
 
-	printf("[x=0][y=0][red]: %d\n", *playerImg[0][0][0]);
-	printf("[x=0][y=0][green]: %d\n", *playerImg[0][0][1]);
-	printf("[x=0][y=0][blue]: %d\n", *playerImg[0][0][2]);
-	printf("[x=0][y=100][red]: %d\n", *playerImg[0][99][0]);
-	printf("[x=1][y=0][red]: %d\n", *playerImg[1][0][0]);
+	printf("[x=0][y=0][red]: %d\n", (*playerImg)[0][0][0]);
+	printf("[x=0][y=0][green]: %d\n", (*playerImg)[0][0][1]);
+	printf("[x=0][y=0][blue]: %d\n", (*playerImg)[0][0][2]);
+	printf("[x=0][y=100][red]: %d\n", (*playerImg)[0][99][0]);
+	printf("[x=1][y=0][red]: %d\n", (*playerImg)[1][0][0]);
+	printf("[x=15][y=15][red]: %x\n", (*playerImg)[15][15][0]);
+	printf("[x=15][y=15][blue]: %x\n", (*playerImg)[15][15][1]);
+	printf("[x=99][y=99][red]: %x\n", (*playerImg)[99][99][0]);
 
 	//unload font
 	XUnloadFont(d, fontId);

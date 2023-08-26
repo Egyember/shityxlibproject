@@ -4,6 +4,7 @@
 #include <X11/Xcms.h> //color stuff
 #include <unistd.h> //sleep
 #include <stdlib.h>
+#include <stdbool.h>
 #include <string.h>
 #include "macros.h"
 #include "types.c"
@@ -20,69 +21,60 @@ img100* loadimg100(char* PATH){
 		printf("szar PATH\n");
 		exit(ERROR);
 	};
-	//char tmp[3];
-	union uTMP{
-		char small[4];
-		char big[80];
-	}tmp;
-	//todo: fix this
-
-	fgets(tmp.small, 4, fptr);
-	if(strcmp(tmp.small,  "P6\n")){
-		printf("szar file \n");
-		printf("magic byte: %s\n", tmp.small);
-		exit(ERROR);
+	//testing the header
+	int headerLen=0;
+	//magicbyte
+	char magicbyte[3]= "";
+	fgets(magicbyte, 3,fptr);
+	if(!strcmp(magicbyte, "p6")){
+	printf("wrogn file (raw ppm expected)\n");
 	};
-	fgets(tmp.big, 80, fptr);
-	if(tmp.big[0] == '#'){
-		printf("skiping comment\n");
-		fgets(tmp.big, 80, fptr);
+	fseek(fptr, 1, SEEK_CUR);
+	headerLen +=3;
+	//skip comments
+	bool run= true;
+	while(run){
+		headerLen +=1;
+		if(fgetc(fptr) == '#' ){
+		for(char i = '\0'; i == '\n'; i = fgetc(fptr)){};
+		headerLen +=1;
+		} else{
+			run = false;
+		};	
 	};
-	if(strcmp(tmp.big,  "100 100\n")){ 
-		printf("szar file \n");
-		printf("img size: %s\n", tmp.big);
-		exit(ERROR);
-	};
-	fgets(tmp.big, 80, fptr);
-	if(strcmp(tmp.big,  "255\n")){ 
-		printf("szar file \n");
-		printf("img maxrgb: %s\n", tmp.big);
-		exit(ERROR);
-	};
-	printf("file good\n");
-	fclose(fptr);
-	fptr = fopen(PATH, "rb");
-	img100* outprt=(img100*)  malloc( sizeof(img100)); //alloc memory for the rgb map
-	printf("allocated %lu mem at: %p\n",sizeof(img100), outprt);
-	for(int x =0; x<100;x++){ //init memory
-		for(int y =0;y<100;y++){
-			for(int rgb =0; rgb<3;rgb++){
-				(*outprt)[x][y][rgb] = 0;
-			};
-		};
-
-	};
-
-
-	int readbuffer[300]; //read buffer
-	fseek(fptr, 61, SEEK_SET); //todo: make this not only accept files from gimp
-	for(int x =0;x<100 ;x++){
-	size_t readbytes = fread(
-		readbuffer, 
-			sizeof(unsigned char),
-			300,
-			fptr
-		);
-		printf("readbytes: %zu\n", readbytes);
-		int bufferID = 0;
-		for(int y = 0; y<100;y++){
-			for(int rgb = 0; rgb<3; rgb++){
-				(*outprt)[x][y][rgb] =  readbuffer[bufferID]; //makeing it int
-				bufferID++;
-			};
+	//image size
+	char sizeXStr[6]; //65536 is the max value
+	for(int i=0; i<6; i++){
+		char current =fgetc(fptr);
+		if(current != ' '){
+		sizeXStr[i] = current;
+		headerLen++;
+		}else{
+		headerLen++;
 		};
 	};
-	fclose(fptr);
+
+	char sizeYStr[6]; //65536 is the max value
+
+	for(int i=0; i<6; i++){
+		char current =fgetc(fptr);
+		if(current != '\n'){
+		sizeYStr[i] = current;
+		headerLen++;
+		}else{
+		headerLen++;
+		};
+	};
+	int sizeX = atoi(sizeXStr);
+	int sizeY = atoi(sizeYStr);
+	if(!(sizeX == 100 & sizeY == 100)){
+		printf("expected image size 100x100 got %dx%d", sizeX, sizeY);
+	};
+	//bitdepth
+
+	//alloc memory
+	img100* outprt = malloc(sizeof(img100));
+
 	return outprt;
 };
 
@@ -202,7 +194,7 @@ int main(){
 //todo: render image from loaded ppm files (with the cpu)
 
 	img100* playerImg =loadimg100("./img/player.ppm");
-	img100* hpImg =loadimg100("./img/hp.ppm"); // másodjára szarul fut le valamiért
+	/*img100* hpImg =loadimg100("./img/hp.ppm"); // másodjára szarul fut le valamiért
 //sometime the values wrong todo: find the bug
 	printf("hp0 0 red: %hhu\n", (*hpImg)[0][0][0]);
 	printf("hp0 0 green: %hhu\n", (*hpImg)[0][0][1]);
@@ -215,7 +207,7 @@ int main(){
 	printf("hp50 50 blue: %hhu\n", (*hpImg)[50][50][2]);
 	
 
-	free(hpImg);
+	free(hpImg);*/
 	free(playerImg);
 	//unload font
 	XUnloadFont(d, fontId);

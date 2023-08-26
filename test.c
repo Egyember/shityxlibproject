@@ -54,6 +54,16 @@ img100* loadimg100(char* PATH){
 	fptr = fopen(PATH, "rb");
 	img100* outprt=(img100*)  malloc( sizeof(img100)); //alloc memory for the rgb map
 	printf("allocated %lu mem at: %p\n",sizeof(img100), outprt);
+	for(int x =0; x<100;x++){ //init memory
+		for(int y =0;y<100;y++){
+			for(int rgb =0; rgb<3;rgb++){
+				(*outprt)[x][y][rgb] = 0;
+			};
+		};
+
+	};
+
+
 	int readbuffer[300]; //read buffer
 	fseek(fptr, 61, SEEK_SET); //todo: make this not only accept files from gimp
 	for(int x =0;x<100 ;x++){
@@ -67,7 +77,7 @@ img100* loadimg100(char* PATH){
 		int bufferID = 0;
 		for(int y = 0; y<100;y++){
 			for(int rgb = 0; rgb<3; rgb++){
-				(*outprt)[x][y][rgb] = readbuffer[bufferID];
+				(*outprt)[x][y][rgb] =  readbuffer[bufferID]; //makeing it int
 				bufferID++;
 			};
 		};
@@ -187,22 +197,26 @@ int main(){
 	XFlush(d);
 	//sleep(10);
 //next task load an image and put it to the sceen
-//todo: load ppm files to memory
 //todo: design map and entity data structures
 //todo load map data from a custom file format
 //todo: render image from loaded ppm files (with the cpu)
 
 	img100* playerImg =loadimg100("./img/player.ppm");
+	img100* hpImg =loadimg100("./img/hp.ppm"); // másodjára szarul fut le valamiért
+//sometime the values wrong todo: find the bug
+	printf("hp0 0 red: %hhu\n", (*hpImg)[0][0][0]);
+	printf("hp0 0 green: %hhu\n", (*hpImg)[0][0][1]);
+	printf("hp0 0 blue: %hhu\n", (*hpImg)[0][0][2]);
+	printf("hp50 50 red: %hhu\n", (*hpImg)[50][50][0]);
+	printf("hp50 50 green: %hhu\n", (*hpImg)[50][50][1]);
+	printf("hp50 50 blue: %hhu\n", (*hpImg)[50][50][2]);
+	printf("hp50 50 red: %hhu\n", (*hpImg)[50][50][0]);
+	printf("hp50 50 green: %hhu\n", (*hpImg)[50][50][1]);
+	printf("hp50 50 blue: %hhu\n", (*hpImg)[50][50][2]);
+	
 
-	printf("[x=0][y=0][red]: %d\n", (*playerImg)[0][0][0]);
-	printf("[x=0][y=0][green]: %d\n", (*playerImg)[0][0][1]);
-	printf("[x=0][y=0][blue]: %d\n", (*playerImg)[0][0][2]);
-	printf("[x=0][y=100][red]: %d\n", (*playerImg)[0][99][0]);
-	printf("[x=1][y=0][red]: %d\n", (*playerImg)[1][0][0]);
-	printf("[x=15][y=15][red]: %x\n", (*playerImg)[15][15][0]);
-	printf("[x=15][y=15][blue]: %x\n", (*playerImg)[15][15][1]);
-	printf("[x=99][y=99][red]: %x\n", (*playerImg)[99][99][0]);
-
+	free(hpImg);
+	free(playerImg);
 	//unload font
 	XUnloadFont(d, fontId);
 	//close connection&destroy window

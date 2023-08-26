@@ -1,1 +1,1 @@
-typedef int img100[100][100][3]; //rgb 
+typedef unsigned char img100[100][100][3]; //rgb 

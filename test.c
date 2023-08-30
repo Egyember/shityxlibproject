@@ -33,13 +33,18 @@ img100* loadimg100(char* PATH){
 	headerLen +=3;
 	//skip comments
 	bool run= true;
+char debugSTR[99];
 	while(run){
-		headerLen +=1;
-		if(fgetc(fptr) == '#' ){
-		for(char i = '\0'; i == '\n'; i = fgetc(fptr)){};
-		headerLen +=1;
+		char current =fgetc(fptr);
+		if(current == '#' ){
+			headerLen +=1;
+			for(char i = 0; i != EOL; i = fgetc(fptr)){
+				headerLen +=1;
+				debugSTR[headerLen] = i;
+			};
 		} else{
 			run = false;
+			fseek(fptr, -1, SEEK_CUR);
 		};	
 	};
 	//image size
@@ -51,6 +56,7 @@ img100* loadimg100(char* PATH){
 		headerLen++;
 		}else{
 		headerLen++;
+		break;
 		};
 	};
 
@@ -63,17 +69,16 @@ img100* loadimg100(char* PATH){
 		headerLen++;
 		}else{
 		headerLen++;
+		break;
 		};
 	};
 	int sizeX = atoi(sizeXStr);
 	int sizeY = atoi(sizeYStr);
 	if(!(sizeX == 100 & sizeY == 100)){
-		printf("expected image size 100x100 got %dx%d", sizeX, sizeY);
+		printf("expected image size 100x100 got %dx%d\n", sizeX, sizeY);
 		exit(ERROR);
 	};
 	//bitdepth
-//todo: implemet this
-	
 	char bitdepthStr[6]; //65536 is the max value
 
 	for(int i=0; i<6; i++){
@@ -83,15 +88,17 @@ img100* loadimg100(char* PATH){
 		headerLen++;
 		}else{
 		headerLen++;
+		break;
 		};
 	};
 
 	int bitdepth = atoi(bitdepthStr);
 	if(bitdepth != 255){
-		printf("expected image bitdepth is 255 got %d", bitdepth);
+		printf("expected image bitdepth is 255 got %d\n", bitdepth);
 		exit(ERROR);
 
 	};
+	printf("ppm header len %d\n", headerLen);
 	//alloc memory
 	img100* outprt = malloc(sizeof(img100));
 

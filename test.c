@@ -69,9 +69,29 @@ img100* loadimg100(char* PATH){
 	int sizeY = atoi(sizeYStr);
 	if(!(sizeX == 100 & sizeY == 100)){
 		printf("expected image size 100x100 got %dx%d", sizeX, sizeY);
+		exit(ERROR);
 	};
 	//bitdepth
+//todo: implemet this
+	
+	char bitdepthStr[6]; //65536 is the max value
 
+	for(int i=0; i<6; i++){
+		char current =fgetc(fptr);
+		if(current != '\n'){
+		bitdepthStr[i] = current;
+		headerLen++;
+		}else{
+		headerLen++;
+		};
+	};
+
+	int bitdepth = atoi(bitdepthStr);
+	if(bitdepth != 255){
+		printf("expected image bitdepth is 255 got %d", bitdepth);
+		exit(ERROR);
+
+	};
 	//alloc memory
 	img100* outprt = malloc(sizeof(img100));
 

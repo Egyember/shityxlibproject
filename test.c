@@ -33,14 +33,18 @@ img100* loadimg100(char* PATH){
 	headerLen +=3;
 	//skip comments
 	bool run= true;
+#ifdef DEBUG
 char debugSTR[99];
+#endif
 	while(run){
 		char current =fgetc(fptr);
 		if(current == '#' ){
 			headerLen +=1;
 			for(char i = 0; i != EOL; i = fgetc(fptr)){
 				headerLen +=1;
+#ifdef DEBUG
 				debugSTR[headerLen] = i;
+#endif
 			};
 		} else{
 			run = false;

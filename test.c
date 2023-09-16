@@ -22,6 +22,7 @@ img100* loadimg100(char* PATH){
 		exit(ERROR);
 	};
 	//testing the header
+	//todo: refactor it to it's own function
 	int headerLen=0;
 	//magicbyte
 	char magicbyte[3]= "";
@@ -103,8 +104,21 @@ char debugSTR[99];
 
 	};
 	printf("ppm header len %d\n", headerLen);
+	//loading the rgb data to memory
+	fclose(fptr);
+	fptr = fopen(PATH, "rb");
+	fseek(fptr, headerLen, SEEK_SET);
 	//alloc memory
 	img100* outprt = malloc(sizeof(img100));
+	//loading rgb data into memory
+	for(int i = 0; i<100;i++){
+		for(int j = 0; j<100;j++){
+			for(int rgb = 0; rgb<3;rgb++){
+				(*outprt)[i][j][rgb] = fgetc(fptr);
+
+			};
+		};
+	};
 
 	return outprt;
 };

@@ -14,21 +14,29 @@ int stringLen(char* str){
 	return len;
 };
 
-img100* loadimg100(char* PATH){
+struct ppheader {
+	bool type; //0 RAW_PPM / 1 ASCII_PPM
+	int sizeX, sizeY, headerLen, bitdepth;;
+};
+
+struct ppheader checkppm(char* PATH){
+	struct ppheader hearer;
 	FILE *fptr;
 	fptr = fopen(PATH, "r");
 	if(fptr == NULL){
 		printf("szar PATH\n");
 		exit(ERROR);
 	};
+
 	//testing the header
-	//todo: refactor it to it's own function
 	int headerLen=0;
 	//magicbyte
 	char magicbyte[3]= "";
 	fgets(magicbyte, 3,fptr);
-	if(!strcmp(magicbyte, "p6")){
-	printf("wrogn file (raw ppm expected)\n");
+	if(strcmp(magicbyte, "p6")){
+		hearer.type = RAW_PPM;
+	} else {
+		hearer.type = ASCII_PPM;
 	};
 	fseek(fptr, 1, SEEK_CUR);
 	headerLen +=3;
@@ -53,11 +61,11 @@ char debugSTR[99];
 		};	
 	};
 	//image size
-	char sizeXStr[6]; //65536 is the max value
+	char sizeStr[6]; //65536 is the max value
 	for(int i=0; i<6; i++){
 		char current =fgetc(fptr);
 		if(current != ' '){
-		sizeXStr[i] = current;
+		sizeStr[i] = current;
 		headerLen++;
 		}else{
 		headerLen++;
@@ -65,24 +73,19 @@ char debugSTR[99];
 		};
 	};
 
-	char sizeYStr[6]; //65536 is the max value
+	hearer.sizeX = atoi(sizeStr);
 
 	for(int i=0; i<6; i++){
 		char current =fgetc(fptr);
 		if(current != '\n'){
-		sizeYStr[i] = current;
+		sizeStr[i] = current;
 		headerLen++;
 		}else{
 		headerLen++;
 		break;
 		};
 	};
-	int sizeX = atoi(sizeXStr);
-	int sizeY = atoi(sizeYStr);
-	if(!(sizeX == 100 & sizeY == 100)){
-		printf("expected image size 100x100 got %dx%d\n", sizeX, sizeY);
-		exit(ERROR);
-	};
+	hearer.sizeY = atoi(sizeStr);
 	//bitdepth
 	char bitdepthStr[6]; //65536 is the max value
 
@@ -97,17 +100,22 @@ char debugSTR[99];
 		};
 	};
 
-	int bitdepth = atoi(bitdepthStr);
-	if(bitdepth != 255){
-		printf("expected image bitdepth is 255 got %d\n", bitdepth);
-		exit(ERROR);
-
-	};
-	printf("ppm header len %d\n", headerLen);
-	//loading the rgb data to memory
+	hearer.bitdepth = atoi(bitdepthStr);
+	hearer.headerLen = headerLen;
 	fclose(fptr);
+	return hearer;
+};
+
+img100* loadimg100(char* PATH){
+	struct ppheader hearer = checkppm(PATH);
+		//loading the rgb data to memory
+	if(!(hearer.bitdepth==255 & hearer.type == RAW_PPM & hearer.sizeX == 100 & hearer.sizeY == 100)){
+		printf("bad file %s\n", PATH);
+		exit(ERROR);
+	};
+	FILE *fptr;
 	fptr = fopen(PATH, "rb");
-	fseek(fptr, headerLen, SEEK_SET);
+	fseek(fptr, hearer.headerLen, SEEK_SET);
 	//alloc memory
 	img100* outprt = malloc(sizeof(img100));
 	//loading rgb data into memory
@@ -239,7 +247,7 @@ int main(){
 //todo: render image from loaded ppm files (with the cpu)
 
 	img100* playerImg =loadimg100("./img/player.ppm");
-	/*img100* hpImg =loadimg100("./img/hp.ppm"); // másodjára szarul fut le valamiért
+	img100* hpImg =loadimg100("./img/hp.ppm"); // másodjára szarul fut le valamiért
 //sometime the values wrong todo: find the bug
 	printf("hp0 0 red: %hhu\n", (*hpImg)[0][0][0]);
 	printf("hp0 0 green: %hhu\n", (*hpImg)[0][0][1]);
@@ -252,7 +260,7 @@ int main(){
 	printf("hp50 50 blue: %hhu\n", (*hpImg)[50][50][2]);
 	
 
-	free(hpImg);*/
+	free(hpImg);
 	free(playerImg);
 	//unload font
 	XUnloadFont(d, fontId);

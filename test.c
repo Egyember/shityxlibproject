@@ -155,6 +155,8 @@ int main(){
 	int ds =DefaultScreen(d);
 	printf("ds: %d\n", ds);
 
+	//DefaultDepth
+	printf("DefaultDepth: %d\n", DefaultDepth(d,0));
 	//create a window
 	Window Win = XCreateSimpleWindow(d, RootWindow(d, ds), 2, 1, 400, 400, 1, WhitePixel(d, ds), WhitePixel(d, ds));
 	XSelectInput(d, Win, StructureNotifyMask);
@@ -181,7 +183,7 @@ int main(){
 	GC gcBlack = XCreateGC(d, Win, 0, NULL);
 	GC gcRed = XCreateGC(d, Win, 0, NULL);
 	
-	//set gc fireground color	
+	//set gc foreground color	
 	XSetForeground(d, gcBlack, BlackPixel(d, ds)); 
 	XSetForeground(d, gcRed, RedColor.pixel);
 	XSetLineAttributes(d, gcRed, 10, LineSolid, CapButt, JoinRound);
@@ -247,18 +249,26 @@ int main(){
 //todo: render image from loaded ppm files (with the cpu)
 
 	img100* playerImg =loadimg100("./img/player.ppm");
-	img100* hpImg =loadimg100("./img/hp.ppm"); // másodjára szarul fut le valamiért
-//sometime the values wrong todo: find the bug
-	printf("hp0 0 red: %hhu\n", (*hpImg)[0][0][0]);
-	printf("hp0 0 green: %hhu\n", (*hpImg)[0][0][1]);
-	printf("hp0 0 blue: %hhu\n", (*hpImg)[0][0][2]);
-	printf("hp50 50 red: %hhu\n", (*hpImg)[50][50][0]);
-	printf("hp50 50 green: %hhu\n", (*hpImg)[50][50][1]);
-	printf("hp50 50 blue: %hhu\n", (*hpImg)[50][50][2]);
-	printf("hp50 50 red: %hhu\n", (*hpImg)[50][50][0]);
-	printf("hp50 50 green: %hhu\n", (*hpImg)[50][50][1]);
-	printf("hp50 50 blue: %hhu\n", (*hpImg)[50][50][2]);
+	img100* hpImg =loadimg100("./img/hp.ppm");
+	unsigned char *testingIMG=(unsigned char *)malloc(100*100*4);
+	unsigned char *p = testingIMG;
+	int i =0 ;
+	for(int x=0;x<100;x++){
+		for(int j =0; j<100;j++){
+			*p++=0; //blue
+			*p++=255; //grean
+			*p++=0; //red
+			p++; //god know what
+
+		};
+	};
 	
+	XImage *testImg = XCreateImage(d, DefaultVisual(d, ds), DefaultDepth(d,DefaultScreen(d)) , ZPixmap, 0, testingIMG, 100, 100, 32,0 );
+	printf("bits_per_pixel: %d\n", testImg->bits_per_pixel);
+	printf("sizeof us %lu\n", sizeof(unsigned char));
+	XPutImage(d, Win, DefaultGC(d, DefaultScreen(d)), testImg, 0, 0, 10,10,100,100);
+	sleep(10);
+
 
 	free(hpImg);
 	free(playerImg);

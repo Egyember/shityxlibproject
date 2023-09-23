@@ -14,13 +14,8 @@ int stringLen(char* str){
 	return len;
 };
 
-struct ppheader {
-	bool type; //0 RAW_PPM / 1 ASCII_PPM
-	int sizeX, sizeY, headerLen, bitdepth;;
-};
-
-struct ppheader checkppm(char* PATH){
-	struct ppheader hearer;
+struct ppmHeader checkppm(char* PATH){
+	struct ppmHeader hearer;
 	FILE *fptr;
 	fptr = fopen(PATH, "r");
 	if(fptr == NULL){
@@ -106,10 +101,10 @@ char debugSTR[99];
 	return hearer;
 };
 
-img100* loadimg100(char* PATH){
-	struct ppheader hearer = checkppm(PATH);
+struct ppmImage loadPpmImg(char* PATH){
+	struct ppmHeader hearer = checkppm(PATH);
 		//loading the rgb data to memory
-	if(!(hearer.bitdepth==255 & hearer.type == RAW_PPM & hearer.sizeX == 100 & hearer.sizeY == 100)){
+	if(!(hearer.bitdepth==255)){
 		printf("bad file %s\n", PATH);
 		exit(ERROR);
 	};
@@ -117,18 +112,26 @@ img100* loadimg100(char* PATH){
 	fptr = fopen(PATH, "rb");
 	fseek(fptr, hearer.headerLen, SEEK_SET);
 	//alloc memory
-	img100* outprt = malloc(sizeof(img100));
+	struct ppmImage outStruct;
+	outStruct.data= (unsigned char*) malloc(hearer.sizeX*hearer.sizeY*4);
 	//loading rgb data into memory
+	unsigned char *p = outStruct.data;
+	p++;
 	for(int i = 0; i<100;i++){
 		for(int j = 0; j<100;j++){
-			for(int rgb = 0; rgb<3;rgb++){
-				(*outprt)[i][j][rgb] = fgetc(fptr);
-
+			*(p+1)=fgetc(fptr);
+			*p=fgetc(fptr);
+			*(p-1)=fgetc(fptr);
+			if(p!=outStruct.data+hearer.sizeX*hearer.sizeY*4-3){
+			p+=4;
 			};
 		};
 	};
-
-	return outprt;
+	//copy metadata
+	outStruct.high=hearer.sizeX;
+	outStruct.width=hearer.sizeY;
+	outStruct.bitdepth=hearer.bitdepth;
+	return outStruct;
 };
 
 int main(){
@@ -248,30 +251,19 @@ int main(){
 //todo load map data from a custom file format
 //todo: render image from loaded ppm files (with the cpu)
 
-	img100* playerImg =loadimg100("./img/player.ppm");
-	img100* hpImg =loadimg100("./img/hp.ppm");
-	unsigned char *testingIMG=(unsigned char *)malloc(100*100*4);
-	unsigned char *p = testingIMG;
-	int i =0 ;
-	for(int x=0;x<100;x++){
-		for(int j =0; j<100;j++){
-			*p++=0; //blue
-			*p++=255; //grean
-			*p++=0; //red
-			p++; //god know what
-
-		};
-	};
+	struct ppmImage playerImg =loadPpmImg("./img/player.ppm");
+	struct ppmImage hpImg =loadPpmImg("./img/hp.ppm");
 	
-	XImage *testImg = XCreateImage(d, DefaultVisual(d, ds), DefaultDepth(d,DefaultScreen(d)) , ZPixmap, 0, testingIMG, 100, 100, 32,0 );
+
+	XImage *testImg = XCreateImage(d, DefaultVisual(d, ds), DefaultDepth(d,DefaultScreen(d)) , ZPixmap, 0, hpImg.data, hpImg.width, hpImg.high, 32,0 );
 	printf("bits_per_pixel: %d\n", testImg->bits_per_pixel);
 	printf("sizeof us %lu\n", sizeof(unsigned char));
-	XPutImage(d, Win, DefaultGC(d, DefaultScreen(d)), testImg, 0, 0, 10,10,100,100);
+	XPutImage(d, Win, DefaultGC(d, DefaultScreen(d)), testImg, 0, 0, 100,100,100,100);
 	sleep(10);
 
 
-	free(hpImg);
-	free(playerImg);
+	free(hpImg.data);
+	free(playerImg.data);
 	//unload font
 	XUnloadFont(d, fontId);
 	//close connection&destroy window

@@ -8,3 +8,4 @@
 #if !defined(NDEBUG)
 #define DEBUG
 #endif
+#define GRAVITYFOCE 10

@@ -134,6 +134,36 @@ struct ppmImage loadPpmImg(char* PATH){
 	return outStruct;
 };
 
+void gravity(struct entity* target){
+	target->vector[0]+=GRAVITYFOCE;
+};
+
+void applyVector(struct entity* target){
+				target->x += target->vector[0];
+				target->y += target->vector[1];
+};
+
+void calculateTick(struct entity* firstEntity){
+	bool run =true;
+	struct entity* currentEntity=firstEntity;
+	while(run){
+		if(currentEntity->hasPhysics==true){
+			gravity(currentEntity);
+		};
+		switch(currentEntity->type){
+			case player:
+				applyVector(currentEntity);
+
+			case enemy:
+				applyVector(currentEntity);
+
+			default:
+
+
+		};
+	};
+};
+
 int main(){
 	printf("hello word!\n");
 	//connect to the x server ($DISPLAY env)
@@ -246,7 +276,6 @@ int main(){
 		//flush Xbuffer
 	XFlush(d);
 	//sleep(10);
-//next task load an image and put it to the sceen
 //todo: design map and entity data structures
 //todo load map data from a custom file format
 //todo: render image from loaded ppm files (with the cpu)

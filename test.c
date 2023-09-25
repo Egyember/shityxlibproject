@@ -235,8 +235,8 @@ int main(){
 	int numberOfFonts;
 	char **fontlist = XListFonts(d, "-misc-unifont-medium-*iso8859-2", 200, &numberOfFonts); //I fucking hate font handeling in X11
 	if(numberOfFonts==0){
-		printf("missing font\n");
-		exit(ERROR);
+		printf("missing font useing fallback\n");
+		fontlist = XListFonts(d, "*iso8859-2", 200, &numberOfFonts); //I fucking hate font handeling in X11
 	};	
 	printf("printing fonts \n");
 	printf("%d\n", numberOfFonts);

@@ -13,6 +13,12 @@ enum entityType{
 	decor
 };
 
+struct entityStart{
+	struct entity* firstNode;
+	unsigned int totalNumber;
+
+};
+
 struct entity {
 	int x,y;
 	unsigned int renderDistence, ID;

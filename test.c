@@ -143,9 +143,12 @@ void applyVector(struct entity* target){
 				target->y += target->vector[1];
 };
 
-void calculateTick(struct entity* firstEntity){
+void calculateTick(struct entityStart firstEntity){
+	if(firstEntity.firstNode == NULL){
+		exit(ERROR);
+	};
+	struct entity* currentEntity =firstEntity.firstNode;
 	bool run =true;
-	struct entity* currentEntity=firstEntity;
 	while(run){
 		if(currentEntity->hasPhysics==true){
 			gravity(currentEntity);

@@ -1,9 +1,11 @@
+#include <bits/time.h>
 #include <stdio.h>
 #include <X11/X.h>
 #include <X11/Xlib.h> //main Xlib header
 #include <X11/Xcms.h> //color stuff
 #include <unistd.h> //sleep
 #include <stdlib.h>
+#include <time.h>
 #include <stdbool.h>
 #include <string.h>
 #include "macros.h"
@@ -140,6 +142,10 @@ void gravity(struct entity* target){
 void applyVector(struct entity* target){
 	target->x += target->vector[0];
 	target->y += target->vector[1];	
+
+//only for testing
+	target->vector[0] = 0;	
+	target->vector[1] = 0;	
 };
 void collisondetect(struct entity* target){
 
@@ -160,9 +166,7 @@ void calculateTick(struct entityStart firstEntity){
 		if(currentEntity->hasPhysics == true){
 			gravity(currentEntity);
 		};
-		if(currentEntity->hasPhysics == true){
-			gravity(currentEntity);
-		};
+		applyVector(currentEntity);
 		if(currentEntity->hasCollision == true){
 			collisondetect(currentEntity);	
 		};
@@ -303,18 +307,34 @@ int main(){
 	struct entityStart mainentity;
 	mainentity.firstNode = (struct entity*) malloc(sizeof(struct entity));
 	mainentity.totalNumber = 1;
-	mainentity.firstNode->texture = loadPpmImg("./img/player.png");
+	mainentity.firstNode->texture = loadPpmImg("./img/player.ppm");
 	mainentity.firstNode->type = player;
 	mainentity.firstNode->hasPhysics = true;
 	mainentity.firstNode->hasCollision = true;
 	mainentity.firstNode->nextEntity = NULL;
-	mainentity.firstNode->hitBox = (10,10,-10,-10);
+	mainentity.firstNode->hitBox[0] = 10;
+	mainentity.firstNode->hitBox[1] = 10;
+	mainentity.firstNode->hitBox[2] = -10;
+	mainentity.firstNode->hitBox[3] = -10;
 	mainentity.firstNode->ID = 1;
 	mainentity.firstNode->x = 0;
 	mainentity.firstNode->y = 0;
+	mainentity.firstNode->vector[0] = 0;
+	mainentity.firstNode->vector[1] = 0;
+
+
+  time_t start,end;
+  double dif;
 
 	while(true){
+		time(&start);
 		calculateTick(mainentity);
+		printf("x: %d\ny: %d\n", mainentity.firstNode->x, mainentity.firstNode->y);
+		time (&end);
+		dif = difftime (end,start);
+		sleep((1.0/60.0)-dif);
+		printf("sleept %f\n", (1.0/60.0)-dif);
+
 	};
 
 	free(hpImg.data);

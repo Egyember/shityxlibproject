@@ -133,14 +133,21 @@ struct ppmImage loadPpmImg(char* PATH){
 	outStruct.bitdepth=hearer.bitdepth;
 	return outStruct;
 };
-
 void gravity(struct entity* target){
 	target->vector[0]+=GRAVITYFOCE;
 };
 
 void applyVector(struct entity* target){
-				target->x += target->vector[0];
-				target->y += target->vector[1];
+	target->x += target->vector[0];
+	target->y += target->vector[1];	
+};
+void collisondetect(struct entity* target){
+
+};
+
+void inCollison(int x, int y, int *escapevector[2]){
+// this function shoud chek for collison and return an escape vector
+// this desing also intruduses a bug but it's good for now
 };
 
 void calculateTick(struct entityStart firstEntity){
@@ -150,19 +157,18 @@ void calculateTick(struct entityStart firstEntity){
 	struct entity* currentEntity =firstEntity.firstNode;
 	bool run =true;
 	while(run){
-		if(currentEntity->hasPhysics==true){
+		if(currentEntity->hasPhysics == true){
 			gravity(currentEntity);
 		};
-		switch(currentEntity->type){
-			case player:
-				applyVector(currentEntity);
-
-			case enemy:
-				applyVector(currentEntity);
-
-			default:
-
-
+		if(currentEntity->hasPhysics == true){
+			gravity(currentEntity);
+		};
+		if(currentEntity->hasCollision == true){
+			collisondetect(currentEntity);	
+		};
+		currentEntity = currentEntity->nextEntity;
+		if(currentEntity == NULL){
+			run = false;
 		};
 	};
 };
@@ -292,7 +298,24 @@ int main(){
 	printf("sizeof us %lu\n", sizeof(unsigned char));
 	XPutImage(d, Win, DefaultGC(d, DefaultScreen(d)), testImg, 0, 0, 100,100,100,100);
 	sleep(10);
+	
+	//main loop
+	struct entityStart mainentity;
+	mainentity.firstNode = (struct entity*) malloc(sizeof(struct entity));
+	mainentity.totalNumber = 1;
+	mainentity.firstNode->texture = loadPpmImg("./img/player.png");
+	mainentity.firstNode->type = player;
+	mainentity.firstNode->hasPhysics = true;
+	mainentity.firstNode->hasCollision = true;
+	mainentity.firstNode->nextEntity = NULL;
+	mainentity.firstNode->hitBox = (10,10,-10,-10);
+	mainentity.firstNode->ID = 1;
+	mainentity.firstNode->x = 0;
+	mainentity.firstNode->y = 0;
 
+	while(true){
+		calculateTick(mainentity);
+	};
 
 	free(hpImg.data);
 	free(playerImg.data);

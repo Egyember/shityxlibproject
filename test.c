@@ -138,24 +138,31 @@ struct ppmImage loadPpmImg(char* PATH){
 void gravity(struct entity* target){
 	target->vector[0]+=GRAVITYFOCE;
 };
+void pointVectorToLine(int point[2], int vector[2], int (*returnPointer)[3]){
+//vec(V1, V2)
+//P(X0,Y0)
+//V2x - V1y = V2X0 - V1Y0
+//Ax - By = C
+//returnPointer[0]=A
+//returnPointer[1]=B
+//returnPointer[2]=C
+	int A = vector[1];
+	int B = vector[0];
+	int C = vector[1]*point[0]-vector[1]*point[1];
+	(*returnPointer)[0] = A;
+	(*returnPointer)[1] = B;
+	(*returnPointer)[2] = C;
 
+};
 void applyVector(struct entity* target){
 	target->x += target->vector[0];
 	target->y += target->vector[1];	
-
+/*
 //only for testing
 	target->vector[0] = 0;	
 	target->vector[1] = 0;	
-};
-void collisondetect(struct entity* target){
-
-};
-
-void inCollison(int x, int y, int *escapevector[2]){
-// this function shoud chek for collison and return an escape vector
-// this desing also intruduses a bug but it's good for now
-};
-
+*/
+	};
 void calculateTick(struct entityStart firstEntity){
 	if(firstEntity.firstNode == NULL){
 		exit(ERROR);
@@ -167,9 +174,6 @@ void calculateTick(struct entityStart firstEntity){
 			gravity(currentEntity);
 		};
 		applyVector(currentEntity);
-		if(currentEntity->hasCollision == true){
-			collisondetect(currentEntity);	
-		};
 		currentEntity = currentEntity->nextEntity;
 		if(currentEntity == NULL){
 			run = false;

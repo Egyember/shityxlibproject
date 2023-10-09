@@ -1,3 +1,5 @@
+typedef int *line[3];
+
 struct ppmHeader {
 	bool type; //0 RAW_PPM / 1 ASCII_PPM
 	int sizeX, sizeY, headerLen, bitdepth;

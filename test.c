@@ -138,7 +138,7 @@ struct ppmImage loadPpmImg(char* PATH){
 void gravity(struct entity* target){
 	target->vector[0]+=GRAVITYFOCE;
 };
-void pointVectorToLine(int point[2], int vector[2], int (*returnPointer)[3]){
+void pointVectorToLine(int point[2], int vector[2], line returnPointer){
 //vec(V1, V2)
 //P(X0,Y0)
 //V2x - V1y = V2X0 - V1Y0
@@ -152,6 +152,20 @@ void pointVectorToLine(int point[2], int vector[2], int (*returnPointer)[3]){
 	(*returnPointer)[0] = A;
 	(*returnPointer)[1] = B;
 	(*returnPointer)[2] = C;
+
+};
+
+void getCollisionTowLine(line line1, line line2, int *returnprt[2]){
+//line1 = (a,b,c)
+//line2 = (d,e,f)
+//
+//ax-by=c
+//dx-ey=f
+//
+//y = (dc-af)/((-db)-(-ae))
+//x = (c+by)/a
+
+
 
 };
 void applyVector(struct entity* target){

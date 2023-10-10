@@ -164,8 +164,8 @@ void getCollisionTowLine(line line1, line line2, int *returnprt[2]){
 //
 //y = (dc-af)/((-db)-(-ae))
 //x = (c+by)/a
-
-
+int y = (*line2[0] * *line1[2]-*line1[0] * *line2[2])/(((*line2[2] * *line1[1])*-1)- (-1*(*line1[0]* *line2[1])));
+int x = (*line1[2] + *line1[1]*y)/ *line1[0];
 
 };
 void applyVector(struct entity* target){
@@ -315,7 +315,7 @@ int main(){
 	struct ppmImage hpImg =loadPpmImg("./img/hp.ppm");
 	
 
-	XImage *testImg = XCreateImage(d, DefaultVisual(d, ds), DefaultDepth(d,DefaultScreen(d)) , ZPixmap, 0, hpImg.data, hpImg.width, hpImg.high, 32,0 );
+	XImage *testImg = XCreateImage(d, DefaultVisual(d, ds), DefaultDepth(d,DefaultScreen(d)) , ZPixmap, 0, playerImg.data, hpImg.width, hpImg.high, 32,0 );
 	printf("bits_per_pixel: %d\n", testImg->bits_per_pixel);
 	printf("sizeof us %lu\n", sizeof(unsigned char));
 	XPutImage(d, Win, DefaultGC(d, DefaultScreen(d)), testImg, 0, 0, 100,100,100,100);

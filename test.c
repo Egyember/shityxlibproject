@@ -12,8 +12,8 @@
 #include "types.c"
 
 int stringLen(char* str){
-	int len = strlen(str); //local wraper needed because i had no idea tha this thing existed when i wrote the rest of the file
-	return len;
+	//local wraper needed because i had no idea tha this thing existed when i wrote the rest of the file
+	return strlen(str);
 };
 
 struct ppmHeader checkppm(char* PATH){
@@ -149,9 +149,29 @@ void pointVectorToLine(int point[2], int vector[2], line returnPointer){
 	int A = vector[1];
 	int B = vector[0];
 	int C = vector[1]*point[0]-vector[1]*point[1];
-	(*returnPointer)[0] = A;
-	(*returnPointer)[1] = B;
-	(*returnPointer)[2] = C;
+	(*returnPointer)[0] = (int) A;
+	(*returnPointer)[1] = (int) B;
+	(*returnPointer)[2] = (int) C;
+
+};
+
+void pointToPointVector(int point1[2], int point2[2], int* returnVector[2]){
+	//calculate a vector from the first point to the secund vector and return to pointer to a vector
+	point1[0]-= point2[0];
+	point1[1]-= point2[1];
+	(*returnVector)[0] = point1[0];
+	(*returnVector)[1] = point1[1];
+};
+
+bool doVectorsParallel(int vector1[2], int vector2[2]){
+	//returne true if the vectors are parallel
+	float Vec1fraction = vector1[0]/vector1[1];
+	float Vec2fraction = vector2[0]/vector2[1];
+	float Vec2fractionAlt = vector2[1]/vector2[0];
+	if (Vec1fraction == Vec2fraction || Vec1fraction == Vec2fractionAlt){
+		return true;
+	};
+	return false;
 
 };
 
@@ -166,11 +186,16 @@ void getCollisionTowLine(line line1, line line2, int *returnprt[2]){
 //x = (c+by)/a
 int y = (*line2[0] * *line1[2]-*line1[0] * *line2[2])/(((*line2[2] * *line1[1])*-1)- (-1*(*line1[0]* *line2[1])));
 int x = (*line1[2] + *line1[1]*y)/ *line1[0];
-
+(*returnprt)[0] = (int) x;
+(*returnprt)[1] = (int) y;
 };
 void applyVector(struct entity* target){
-	target->x += target->vector[0];
-	target->y += target->vector[1];	
+	if(target->hasCollision == false){
+		target->x += target->vector[0];
+		target->y += target->vector[1];
+		return;
+	};
+
 /*
 //only for testing
 	target->vector[0] = 0;	

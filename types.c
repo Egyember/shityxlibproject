@@ -29,6 +29,6 @@ struct entity {
 	bool hasPhysics;
 	int vector[2];
 	bool hasCollision;
-	int hitBox[4];// from x,y cordinate x1,y1,x2,y2 
-	struct entity* nextEntity; //point to the next entity
+	int hitBox[4][2];// 4 corner of the rectangle (x,y)
+	struct entity* nextEntity; //pointer to the next entity
 };

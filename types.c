@@ -1,4 +1,12 @@
+#include <stdbool.h>
+
+
 typedef int *line[3];
+//Ax - By = C
+//(A;B;C)
+
+typedef int vector[2];
+//(y;x)
 
 struct ppmHeader {
 	bool type; //0 RAW_PPM / 1 ASCII_PPM
@@ -22,13 +30,24 @@ struct entityStart{
 };
 
 struct entity {
-	int x,y;
+	int x,y, lastx, lasty;
 	unsigned int renderDistence, ID;
 	enum entityType type;
 	struct ppmImage texture;
 	bool hasPhysics;
-	int vector[2];
+	vector vector;
 	bool hasCollision;
-	int hitBox[4][2];// 4 corner of the rectangle (x,y)
 	struct entity* nextEntity; //pointer to the next entity
+	struct hitBox* hitboxptr;
 };
+
+struct hitBox {
+	int hitBox[4][2];// 4 corner of the rectangle (x,y) relative from the main cordinates of owner is null relative from map origine
+	line lines[4];
+	vector vectors[4];
+	struct entity* owner;
+	struct hitBox* nextHitBox;
+};
+
+
+

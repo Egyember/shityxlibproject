@@ -138,7 +138,7 @@ struct ppmImage loadPpmImg(char* PATH){
 void gravity(struct entity* target){
 	target->vector[0]+=GRAVITYFOCE;
 };
-void pointVectorToLine(int point[2], int vector[2], line returnPointer){
+void pointVectorToLine(int point[2], vector vector, line returnPointer){
 //vec(V1, V2)
 //P(X0,Y0)
 //V2x - V1y = V2X0 - V1Y0
@@ -155,7 +155,7 @@ void pointVectorToLine(int point[2], int vector[2], line returnPointer){
 
 };
 
-void pointToPointVector(int point1[2], int point2[2], int* returnVector[2]){
+void pointToPointVector(int point1[2], int point2[2], vector* returnVector){
 	//calculate a vector from the first point to the secund vector and return to pointer to a vector
 	point1[0]-= point2[0];
 	point1[1]-= point2[1];
@@ -163,11 +163,11 @@ void pointToPointVector(int point1[2], int point2[2], int* returnVector[2]){
 	(*returnVector)[1] = point1[1];
 };
 
-bool doVectorsParallel(int vector1[2], int vector2[2]){
+bool doVectorsParallel(vector vector1, vector vector2){
 	//returne true if the vectors are parallel
-	float Vec1fraction = vector1[0]/vector1[1];
-	float Vec2fraction = vector2[0]/vector2[1];
-	float Vec2fractionAlt = vector2[1]/vector2[0];
+	float Vec1fraction = vector1[0]/ (float) vector1[1];
+	float Vec2fraction = vector2[0]/ (float) vector2[1];
+	float Vec2fractionAlt = vector2[1]/ (float) vector2[0];
 	if (Vec1fraction == Vec2fraction || Vec1fraction == Vec2fractionAlt){
 		return true;
 	};
@@ -176,26 +176,32 @@ bool doVectorsParallel(int vector1[2], int vector2[2]){
 };
 
 void getCollisionTowLine(line line1, line line2, int *returnprt[2]){
-//line1 = (a,b,c)
-//line2 = (d,e,f)
-//
-//ax-by=c
-//dx-ey=f
-//
-//y = (dc-af)/((-db)-(-ae))
-//x = (c+by)/a
-int y = (*line2[0] * *line1[2]-*line1[0] * *line2[2])/(((*line2[2] * *line1[1])*-1)- (-1*(*line1[0]* *line2[1])));
-int x = (*line1[2] + *line1[1]*y)/ *line1[0];
-(*returnprt)[0] = (int) x;
-(*returnprt)[1] = (int) y;
+	//line1 = (a,b,c)
+	//line2 = (d,e,f)
+	//
+	//ax-by=c
+	//dx-ey=f
+	//
+	//y = (dc-af)/((-db)-(-ae))
+	//x = (c+by)/a
+	int y = (*line2[0] * *line1[2]-*line1[0] * *line2[2])/(((*line2[2] * *line1[1])*-1)- (-1*(*line1[0]* *line2[1])));
+	int x = (*line1[2] + *line1[1]*y)/ *line1[0];
+	(*returnprt)[0] = (int) x;
+	(*returnprt)[1] = (int) y;
 };
+
+void makeHitBoxLines(struct hitBox* hitBoxptr){
+	
+};
+
+
 void applyVector(struct entity* target){
 	if(target->hasCollision == false){
 		target->x += target->vector[0];
 		target->y += target->vector[1];
 		return;
 	};
-
+//todo: collision 
 /*
 //only for testing
 	target->vector[0] = 0;	
@@ -355,10 +361,12 @@ int main(){
 	mainentity.firstNode->hasPhysics = true;
 	mainentity.firstNode->hasCollision = true;
 	mainentity.firstNode->nextEntity = NULL;
-	mainentity.firstNode->hitBox[0] = 10;
+
+/*	mainentity.firstNode->hitBox[0] = 10;
 	mainentity.firstNode->hitBox[1] = 10;
 	mainentity.firstNode->hitBox[2] = -10;
 	mainentity.firstNode->hitBox[3] = -10;
+*/
 	mainentity.firstNode->ID = 1;
 	mainentity.firstNode->x = 0;
 	mainentity.firstNode->y = 0;

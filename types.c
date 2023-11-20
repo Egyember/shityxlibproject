@@ -16,12 +16,15 @@
 #endif
 
 
-typedef int *line[3];
+typedef int line[3];
 //Ax - By = C
 //(A;B;C)
 
 typedef int vector[2];
 //(y;x)
+
+typedef int point[2];
+//(x;y)
 
 struct ppmHeader {
 	bool type; //0 RAW_PPM / 1 ASCII_PPM

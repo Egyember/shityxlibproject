@@ -25,7 +25,7 @@ int stringLen(char* str){
 void gravity(struct entity* target){
 	target->vector[0]+=GRAVITYFOCE;
 };
-void pointVectorToLine(int point[2], vector vector, line returnPointer){
+void pointVectorToLine(point point, vector vector, line *returnPointer){
 //vec(V1, V2)
 //P(X0,Y0)
 //V2x - V1y = V2X0 - V1Y0
@@ -36,13 +36,13 @@ void pointVectorToLine(int point[2], vector vector, line returnPointer){
 	int A = vector[1];
 	int B = vector[0];
 	int C = vector[1]*point[0]-vector[1]*point[1];
-	(*returnPointer)[0] = (int) A;
-	(*returnPointer)[1] = (int) B;
-	(*returnPointer)[2] = (int) C;
+	(*returnPointer)[0] =  A;
+	(*returnPointer)[1] =  B;
+	(*returnPointer)[2] =  C;
 
 };
 
-void pointToPointVector(int point1[2], int point2[2], vector* returnVector){
+void pointToPointVector(point point1, point point2, vector* returnVector){
 	//calculate a vector from the first point to the secund vector and return to pointer to a vector
 	point1[0]-= point2[0];
 	point1[1]-= point2[1];
@@ -62,7 +62,7 @@ bool doVectorsParallel(vector vector1, vector vector2){
 
 };
 
-void getCollisionTowLine(line line1, line line2, int *returnprt[2]){
+void getCollisionTowLine(line *line1, line *line2, point *returnprt){
 	//line1 = (a,b,c)
 	//line2 = (d,e,f)
 	//
@@ -77,7 +77,20 @@ void getCollisionTowLine(line line1, line line2, int *returnprt[2]){
 	(*returnprt)[1] = (int) y;
 };
 
-void makeHitBoxLines(struct hitBox* hitBoxptr){
+void updateHitBoxStruct(struct hitBox* hitBoxptr){
+	//vectors
+	pointToPointVector(hitBoxptr->hitBox[0], hitBoxptr->hitBox[1], &hitBoxptr->vectors[0]);
+	pointToPointVector(hitBoxptr->hitBox[1], hitBoxptr->hitBox[2], &hitBoxptr->vectors[1]);
+	pointToPointVector(hitBoxptr->hitBox[2], hitBoxptr->hitBox[3], &hitBoxptr->vectors[2]);
+	pointToPointVector(hitBoxptr->hitBox[3], hitBoxptr->hitBox[0], &hitBoxptr->vectors[3]);
+
+	//lines
+	//nem jó mert a map origin-hoz képest lesz igy a vonal mert a pontott nem az entitytől számolom
+	//todo: fix it
+	pointVectorToLine(hitBoxptr->hitBox[0], hitBoxptr->vectors[0], &(hitBoxptr->lines[0]));
+	pointVectorToLine(hitBoxptr->hitBox[1], hitBoxptr->vectors[1], &(hitBoxptr->lines[1]));
+	pointVectorToLine(hitBoxptr->hitBox[2], hitBoxptr->vectors[2], &(hitBoxptr->lines[2]));
+	pointVectorToLine(hitBoxptr->hitBox[3], hitBoxptr->vectors[3], &(hitBoxptr->lines[3]));
 	
 };
 

@@ -1,4 +1,19 @@
+#ifndef mainincludes
+
+#define mainincludes
+#include <bits/time.h>
+#include <stdio.h>
+#include <X11/X.h>
+#include <X11/Xlib.h> //main Xlib header
+#include <X11/Xcms.h> //color stuff
+#include <unistd.h> //sleep
+#include <stdlib.h>
+#include <time.h>
 #include <stdbool.h>
+#include <string.h>
+#include "macros.h"
+
+#endif
 
 
 typedef int *line[3];

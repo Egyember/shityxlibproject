@@ -16,7 +16,7 @@
 
 #endif
 
-struct ppmHeader checkppm(char* PATH){
+struct ppmHeader checkppm(const char* PATH){
 	struct ppmHeader hearer;
 	FILE *fptr;
 	fptr = fopen(PATH, "r");
@@ -103,7 +103,7 @@ char debugSTR[99];
 	return hearer;
 };
 
-struct ppmImage loadPpmImg(char* PATH){
+struct ppmImage loadPpmImg(const char* PATH){
 	struct ppmHeader hearer = checkppm(PATH);
 		//loading the rgb data to memory
 	if(!(hearer.bitdepth==255)){

@@ -17,7 +17,7 @@
 
 #endif
 
-int stringLen(char* str){
+int stringLen(const char* str){
 	//local wraper needed because i had no idea tha this thing existed when i wrote the rest of the file
 	return strlen(str);
 };
@@ -25,7 +25,7 @@ int stringLen(char* str){
 void gravity(struct entity* target){
 	target->vector[0]+=GRAVITYFOCE;
 };
-void pointVectorToLine(point point, vector vector, line *returnPointer){
+void pointVectorToLine(const point point, const vector vector, line *returnPointer){
 //vec(V1, V2)
 //P(X0,Y0)
 //V2x - V1y = V2X0 - V1Y0
@@ -42,15 +42,13 @@ void pointVectorToLine(point point, vector vector, line *returnPointer){
 
 };
 
-void pointToPointVector(point point1, point point2, vector* returnVector){
+void pointToPointVector(const point point1, const point point2, vector* returnVector){
 	//calculate a vector from the first point to the secund vector and return to pointer to a vector
-	point1[0]-= point2[0];
-	point1[1]-= point2[1];
-	(*returnVector)[0] = point1[0];
-	(*returnVector)[1] = point1[1];
+	(*returnVector)[0] = point1[0] - point2[0];
+	(*returnVector)[1] = point1[1] - point2[1];
 };
 
-bool doVectorsParallel(vector vector1, vector vector2){
+bool doVectorsParallel(const vector vector1,const vector vector2){
 	//returne true if the vectors are parallel
 	float Vec1fraction = vector1[0]/ (float) vector1[1];
 	float Vec2fraction = vector2[0]/ (float) vector2[1];
@@ -62,6 +60,7 @@ bool doVectorsParallel(vector vector1, vector vector2){
 
 };
 
+//todo: make it less confusing (remove unnecessary pointers)
 void getCollisionTowLine(line *line1, line *line2, point *returnprt){
 	//line1 = (a,b,c)
 	//line2 = (d,e,f)
@@ -87,6 +86,7 @@ void updateHitBoxStruct(struct hitBox* hitBoxptr){
 	//lines
 	//nem jó mert a map origin-hoz képest lesz igy a vonal mert a pontott nem az entitytől számolom
 	//todo: fix it
+	//todo: finish it
 	pointVectorToLine(hitBoxptr->hitBox[0], hitBoxptr->vectors[0], &(hitBoxptr->lines[0]));
 	pointVectorToLine(hitBoxptr->hitBox[1], hitBoxptr->vectors[1], &(hitBoxptr->lines[1]));
 	pointVectorToLine(hitBoxptr->hitBox[2], hitBoxptr->vectors[2], &(hitBoxptr->lines[2]));
@@ -238,7 +238,6 @@ int main(){
 		//flush Xbuffer
 	XFlush(d);
 	//sleep(10);
-//todo: design map and entity data structures
 //todo load map data from a custom file format
 //todo: render image from loaded ppm files (with the cpu)
 
@@ -272,7 +271,6 @@ int main(){
 	mainentity.firstNode->y = 0;
 	mainentity.firstNode->vector[0] = 0;
 	mainentity.firstNode->vector[1] = 0;
-
 
   time_t start,end;
   double dif;

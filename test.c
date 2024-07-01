@@ -48,6 +48,8 @@ void pointToPointVector(const point point1, const point point2, vector* returnVe
 	(*returnVector)[1] = point1[1] - point2[1];
 };
 
+void asd(){
+	
 bool doVectorsParallel(const vector vector1,const vector vector2){
 	//returne true if the vectors are parallel
 	float Vec1fraction = vector1[0]/ (float) vector1[1];
